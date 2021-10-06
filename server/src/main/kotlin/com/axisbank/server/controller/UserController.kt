@@ -1,37 +1,48 @@
 package com.axisbank.server.controller
 
+import com.axisbank.server.dto.Messages.*
+import com.axisbank.server.exceptions.BlogException
+import com.axisbank.server.exceptions.CommentException
+import com.axisbank.server.exceptions.UserException
+import com.axisbank.server.service.DefaultUserDetailService
 
-import com.axisbank.server.DTO.user.BlogUser
-import com.axisbank.server.service.UserService
-import com.example.server.DTO.user.Messages
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
 @CrossOrigin
 @RestController
-class UserController(val userService: UserService) {
+@RequestMapping(value = ["/user"])
+class UserController(
+    private val defaultUserDetailService: DefaultUserDetailService
+) {
     @RequestMapping(
-        value = ["/users/auth"],
+        value = ["/auth"],
         method = [RequestMethod.POST],
         consumes = ["application/json"]
     )
-    fun authenticateUser(@RequestBody usersSignInDetails: BlogUser): ResponseEntity<Messages.AuthMessage> {
-        val userAuthMessage: Messages.AuthMessage = userService.authUser(usersSignInDetails)
-        return ResponseEntity.ok<Messages.AuthMessage>(userAuthMessage)
+    @Throws(UserException::class, BlogException::class, CommentException::class)
+    fun authenticateUser(
+        @RequestBody userAuthRequest: UserAuthRequest
+    ): ResponseEntity<UserAuthResponse> {
+        val userUserAuthResponse: UserAuthResponse = defaultUserDetailService.authUser(userAuthRequest)
+        return ResponseEntity.ok(userUserAuthResponse)
     }
 
     @RequestMapping(
-        value = ["/users/registration"],
+        value = ["/registration"],
         method = [RequestMethod.POST],
         consumes = ["application/json"]
     )
-    private fun registerUser(@RequestBody users: BlogUser): ResponseEntity<Messages.RegistrationMessage> {
-        val registrationMessage: Messages.RegistrationMessage = userService.registerUser(users)
-        return ResponseEntity.ok<Messages.RegistrationMessage>(registrationMessage)
+    @Throws(UserException::class, BlogException::class, CommentException::class)
+    private fun registerUser(
+        @RequestBody userRegistrationRequest: UserRegistrationRequest
+    ): ResponseEntity<RegistrationMessage> {
+        val registrationMessage: RegistrationMessage =
+            defaultUserDetailService.registerUser(userRegistrationRequest)
+        return ResponseEntity.ok(registrationMessage)
     }
 
-    @get:GetMapping("/users")
-    val allUsers: ResponseEntity<List<Any>>
-        get() = ResponseEntity.ok(userService.allUser)
-
+    @get:GetMapping
+    val allUsers: ResponseEntity<List<Any>> =
+        ResponseEntity.ok(defaultUserDetailService.allUser)
 }
