@@ -1,30 +1,34 @@
 package com.axisbank.server.controller
 
+import com.axisbank.server.dto.Messages.*
 import com.axisbank.server.dto.blog.Blog
 import com.axisbank.server.service.DefaultContentService
 import org.springframework.http.ResponseEntity
+import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RestController
-import java.util.*
 
 @RestController
+@Validated
 class ContentController(
     val contentService: DefaultContentService
 ) {
-    fun getPersonalizedContent() {
-        TODO("Not yet implemented")
+    @PostMapping("/search")
+    fun getSearchedContent(
+        @RequestBody personalizedSearchRequest: PersonalizedSearchRequest
+    ): ResponseEntity<MutableList<Blog>> {
+        return ResponseEntity.ok(contentService.getSearchedContent(personalizedSearchRequest))
     }
 
     @GetMapping
-    fun getPublicContent(): ResponseEntity<SortedSet<Blog>> {
-        return ResponseEntity.ok(contentService.getPublicContent())
+    fun getPublicContent(): ResponseEntity<MutableList<Blog>> {
+        return ResponseEntity.ok(contentService.getAccessableContent())
     }
 
-    fun getPrivateContent() {
-        TODO("Not yet implemented")
-    }
-
-    fun requestedOnDemandContent() {
-        TODO("Not yet implemented")
+    @GetMapping("/private")
+    fun getPrivateContent(): ResponseEntity<MutableList<Blog>> {
+        return ResponseEntity.ok(contentService.getPrivateContent())
     }
 }

@@ -1,12 +1,14 @@
 package com.axisbank.server.dto
 
-import com.axisbank.server.dto.blog.Blog
 import com.axisbank.server.dto.blog.Comment
 import com.axisbank.server.dto.user.BlogUser
+import com.axisbank.server.dto.user.PublicProfile
 import com.axisbank.server.entities.BlogAccessStatus
 import com.axisbank.server.entities.BlogCategory
-import org.bson.types.ObjectId
+import com.axisbank.server.entities.Action
+import org.springframework.validation.annotation.Validated
 
+@Validated
 open class Messages {
 
     data class UserAuthResponse(
@@ -24,6 +26,7 @@ open class Messages {
 
     data class BlogCreationMessage(
         val blogCreated: Boolean,
+        val blogId: String,
         val notice: String
     )
 
@@ -38,9 +41,8 @@ open class Messages {
     )
 
     data class BlogCallMessage(
-        val blogFound: Boolean,
-        val notice: String,
-        val blog: Blog
+        val blogId: String,
+        val userName: String
     )
 
     data class UserRegistrationRequest(
@@ -56,13 +58,14 @@ open class Messages {
     )
 
     data class BlogRequestMessage(
-        val id: ObjectId,
+        val id: String,
         val blogTitle: String,
         val data: String,
         val userName: String,
         val accessStatus: BlogAccessStatus,
         val blogCategory: BlogCategory,
-        val comments: MutableList<Comment>
+        val comments: MutableList<Comment>,
+        val sharedWith: MutableList<PublicProfile>
     )
 
     data class BlogCreateRequestMessage(
@@ -74,25 +77,61 @@ open class Messages {
     )
 
     data class BlogCommentCreateMessage(
-        val blogId: ObjectId,
+        val blogId: String,
         val comment: String,
         val userName: String
     )
 
     data class BlogCommentDeletionMessage(
-        val blogId: ObjectId,
-        val comment: Comment
+        val blogId: String,
+        val commentId: String
     )
 
     data class BlogCommentUpdateMessage(
-        val blogId: ObjectId,
-        val commentId : ObjectId,
+        val blogId: String,
+        val commentId : String,
         val comment: String
     )
 
     data class BlogCommentResponse(
         val comment :Comment,
         val notice: String
+    )
+
+    data class PersonalizedSearchRequest(
+        val category: BlogCategory,
+        val searchString: String
+    )
+
+    data class UpdateBlogAccessStatusRequest(
+        val blogId: String,
+        val blogAccessStatus: BlogAccessStatus
+    )
+
+    data class UpdateBlogDataRequest(
+        val blogId: String,
+        val blogData: String
+    )
+
+    data class UpdateBlogTitleRequest(
+        val blogId: String,
+        val blogTitle: String
+    )
+
+    data class UpdateBlogViewsRequest(
+        val blogId: String,
+        val blogViews: Int
+    )
+
+    data class UpdateBlogCommentsRequest(
+        val blogId: String,
+        val comments: MutableList<Comment>,
+        val commentAction: Action
+    )
+
+    data class UpdateBlogSharedWithRequest(
+        val blogId: String,
+        val listOfSharedWith: MutableList<PublicProfile>
     )
 
 }

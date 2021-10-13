@@ -4,16 +4,19 @@ import com.axisbank.server.dto.Messages.*
 import com.axisbank.server.exceptions.BlogException
 import com.axisbank.server.exceptions.CommentException
 import com.axisbank.server.exceptions.UserException
-import com.axisbank.server.service.DefaultUserDetailService
+import com.axisbank.server.service.DefaultUserService
 
 import org.springframework.http.ResponseEntity
+import org.springframework.validation.BindingResult
+import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
+import javax.validation.Valid
 
 @CrossOrigin
 @RestController
 @RequestMapping(value = ["/user"])
 class UserController(
-    private val defaultUserDetailService: DefaultUserDetailService
+    private val userService: DefaultUserService
 ) {
     @RequestMapping(
         value = ["/auth"],
@@ -22,9 +25,12 @@ class UserController(
     )
     @Throws(UserException::class, BlogException::class, CommentException::class)
     fun authenticateUser(
-        @RequestBody userAuthRequest: UserAuthRequest
+        @RequestBody userAuthRequest: UserAuthRequest,
+        bindingResult: BindingResult
     ): ResponseEntity<UserAuthResponse> {
-        val userUserAuthResponse: UserAuthResponse = defaultUserDetailService.authUser(userAuthRequest)
+        bindErrorResult(bindingResult)
+        val userUserAuthResponse: UserAuthResponse = userService.authUser(userAuthRequest)
+
         return ResponseEntity.ok(userUserAuthResponse)
     }
 
@@ -35,14 +41,36 @@ class UserController(
     )
     @Throws(UserException::class, BlogException::class, CommentException::class)
     private fun registerUser(
-        @RequestBody userRegistrationRequest: UserRegistrationRequest
+        @Valid @RequestBody userRegistrationRequest: UserRegistrationRequest,
+        bindingResult: BindingResult
     ): ResponseEntity<RegistrationMessage> {
+
+
         val registrationMessage: RegistrationMessage =
-            defaultUserDetailService.registerUser(userRegistrationRequest)
+            userService.registerUser(userRegistrationRequest)
+
+        bindErrorResult(bindingResult)
         return ResponseEntity.ok(registrationMessage)
+    }
+
+    @PostMapping("/delete/{username}")
+    private fun deleteUser(@PathVariable username:String) {
+        userService.deleteUser(username)
     }
 
     @get:GetMapping
     val allUsers: ResponseEntity<List<Any>> =
-        ResponseEntity.ok(defaultUserDetailService.allUser)
+        ResponseEntity.ok(userService.allUser)
+
+
+    private fun bindErrorResult(bindingResult: BindingResult) {
+        val errorMessage = StringBuilder()
+        if (bindingResult.hasErrors()) {
+            val errors = bindingResult.fieldErrors
+            for (error in errors) {
+                errorMessage.append(error.defaultMessage + " ")
+            }
+            throw UserException(errorMessage.toString())
+        }
+    }
 }

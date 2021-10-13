@@ -8,12 +8,12 @@ import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean
 @Configuration
 class SpringConfig {
     @Bean
-    fun validatingMongoEventListener(): ValidatingMongoEventListener? {
-        return ValidatingMongoEventListener(validator()!!)
+    fun validatingMongoEventListener(): ValidatingMongoEventListener {
+        return ValidatingMongoEventListener(validator())
     }
 
     @Bean
-    fun validator(): LocalValidatorFactoryBean? {
+    fun validator(): LocalValidatorFactoryBean {
         return LocalValidatorFactoryBean()
     }
 }

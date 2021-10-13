@@ -3,29 +3,31 @@ package com.axisbank.server.utils
 import io.jsonwebtoken.Claims
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.SignatureAlgorithm
+import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
-import org.springframework.stereotype.Service
 import java.util.*
 import java.util.function.Function
+import java.util.stream.Collectors
 
 class JwtUtil {
     companion object {
-        private val SECRET_KEY = "secret"
+        private const val SECRET_KEY = "mySecretKey"
+
         fun extractUsername(token: String?): String {
             return extractClaim(token) { obj: Claims -> obj.subject }
         }
 
-        fun extractExpiration(token: String?): Date {
+        private fun extractExpiration(token: String?): Date {
             return extractClaim(token) { obj: Claims -> obj.expiration }
         }
 
-        fun <T> extractClaim(token: String?, claimsResolver: Function<Claims, T>): T {
+        private fun <T> extractClaim(token: String?, claimsResolver: Function<Claims, T>): T {
             val claims = extractAllClaims(token)
             return claimsResolver.apply(claims)
         }
 
-        private fun extractAllClaims(token: String?): Claims {
-            return Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJws(token).body
+        fun extractAllClaims(token: String?): Claims {
+            return Jwts.parser().setSigningKey(SECRET_KEY.toByteArray()).parseClaimsJws(token).body
         }
 
         private fun isTokenExpired(token: String?): Boolean {
@@ -33,14 +35,25 @@ class JwtUtil {
         }
 
         fun generateToken(userDetails: UserDetails): String {
-            val claims: Map<String, Any> = HashMap()
-            return createToken(claims, userDetails.username)
+            return createToken(userDetails, userDetails.username)
         }
 
-        private fun createToken(claims: Map<String, Any>, subject: String): String {
-            return Jwts.builder().setClaims(claims).setSubject(subject).setIssuedAt(Date(System.currentTimeMillis()))
+        private fun createToken(userDetails: UserDetails, subject: String): String {
+            return Jwts.builder()
+                .claim(
+                    "authorities",
+                    userDetails.authorities.stream()
+                        .map(GrantedAuthority::getAuthority)
+                        .collect(Collectors.toList())
+                )
+                .setSubject(subject)
+                .setIssuedAt(Date(System.currentTimeMillis()))
                 .setExpiration(Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10))
-                .signWith(SignatureAlgorithm.HS256, SECRET_KEY).compact()
+                .signWith(
+                    SignatureAlgorithm.HS512,
+                    SECRET_KEY.toByteArray()
+                )
+                .compact()
         }
 
         fun validateToken(token: String?, userDetails: UserDetails): Boolean {

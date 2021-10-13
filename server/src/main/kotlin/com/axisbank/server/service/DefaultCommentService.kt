@@ -1,55 +1,52 @@
 package com.axisbank.server.service
 
-import com.axisbank.server.contracts.CommentService
+import com.axisbank.server.authority.Authorities
+import com.axisbank.server.service.contracts.CommentService
 import com.axisbank.server.dto.Messages.*
 import com.axisbank.server.dto.blog.Comment
+import com.axisbank.server.entities.Action
 import com.axisbank.server.exceptions.BlogException
 import com.axisbank.server.exceptions.CommentException
 import com.axisbank.server.exceptions.UserException
 import com.axisbank.server.repository.CommentRepository
 import org.bson.types.ObjectId
+import org.springframework.security.core.authority.SimpleGrantedAuthority
+import org.springframework.security.core.context.SecurityContextHolder
+import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.stereotype.Service
 import java.util.*
 
 @Service
 class DefaultCommentService(
-    val userDetailService: DefaultUserDetailService,
+    val userService: DefaultUserService,
     val commentRepository: CommentRepository,
     val publicProfileService: DefaultPublicProfileService,
-    val defaultBlogService: DefaultBlogService
+    val defaultBlogService: DefaultBlogService,
+    val blogUpdateService: DefaultBlogUpdateManagementService,
 ) : CommentService {
 
     @Throws(CommentException::class, UserException::class, BlogException::class)
     override fun addComment(blogCommentCreateMessage: BlogCommentCreateMessage): BlogCommentResponse {
         try {
-            val commentUser = userDetailService.getUserByUsername(blogCommentCreateMessage.userName)
+            val commentUser = userService.getUserByUsername(blogCommentCreateMessage.userName)
 
-            val blog = defaultBlogService.getBlogById(blogCommentCreateMessage.blogId)
+            val savedBlog = defaultBlogService.getBlogById(blogCommentCreateMessage.blogId)
 
             val comment = Comment(
-                blog.id,
-                ObjectId(),
+                savedBlog.id,
+                ObjectId().toString(),
                 publicProfileService.createPublicProfileByUsername(commentUser.userName),
                 blogCommentCreateMessage.comment,
                 Date(System.currentTimeMillis())
             )
             commentRepository.save(comment)
 
-            blog.comments.add(comment)
+            savedBlog.comments.add(comment)
 
-            defaultBlogService.updateBlog(
-                BlogRequestMessage(
-                    blog.id,
-                    blog.blogTitle,
-                    blog.data,
-                    blog.owner.userName,
-                    blog.blogAccessStatus,
-                    blog.blogCategory,
-                    blog.comments
-                )
-            )
+            blogUpdateService.updateBlogComments(UpdateBlogCommentsRequest(savedBlog.id, savedBlog.comments, Action.ADD))
+
             return BlogCommentResponse(comment, "Comment Added Successfully")
-        }catch (e :IllegalStateException) {
+        } catch (e: IllegalStateException) {
             e.printStackTrace()
             throw CommentException("An error occurred while saving the comment")
         }
@@ -57,27 +54,27 @@ class DefaultCommentService(
 
     @Throws(CommentException::class, UserException::class, BlogException::class)
     override fun deleteComment(blogCommentDeletionMessage: BlogCommentDeletionMessage): BlogCommentResponse {
+        val principal = SecurityContextHolder.getContext().authentication.principal as UserDetails
+        val authenticatedUser = principal.username
+        val authorities = principal.authorities as Set<*>
+
         try {
-        val blog = defaultBlogService.getBlogById(blogCommentDeletionMessage.blogId)
-        val comment = getCommentById(blogCommentDeletionMessage.comment.commentId)
 
-        commentRepository.delete(comment)
+            val savedBlog = defaultBlogService.getBlogById(blogCommentDeletionMessage.blogId)
+            val comment = getCommentById(blogCommentDeletionMessage.commentId)
+            if (authenticatedUser == savedBlog.owner.userName || authorities.contains(SimpleGrantedAuthority(Authorities.ROLE_ADMIN.toString()))) {
+                commentRepository.delete(comment)
 
-        blog.comments.remove(comment)
+                savedBlog.comments.remove(comment)
 
-        defaultBlogService.updateBlog(
-            BlogRequestMessage(
-                blog.id,
-                blog.blogTitle,
-                blog.data,
-                blog.owner.userName,
-                blog.blogAccessStatus,
-                blog.blogCategory,
-                blog.comments
-            )
-        )
 
-        return BlogCommentResponse(comment, "Comment Removed Successfully")
+                blogUpdateService.updateBlogComments(UpdateBlogCommentsRequest(savedBlog.id, savedBlog.comments, Action.ADD))
+
+
+                return BlogCommentResponse(comment, "Comment Removed Successfully")
+            } else {
+                throw UserException("Invalid Access")
+            }
         } catch (e: IllegalStateException) {
             e.printStackTrace()
             throw CommentException("An error occurred while deleting the comment")
@@ -85,7 +82,7 @@ class DefaultCommentService(
     }
 
     @Throws(CommentException::class)
-    private fun getCommentById(commentId: ObjectId): Comment {
+    private fun getCommentById(commentId: String): Comment {
         try {
             val comment = commentRepository.findById(commentId)
             return comment.get()
@@ -97,34 +94,35 @@ class DefaultCommentService(
 
     @Throws(CommentException::class, BlogException::class)
     override fun updateComment(blogCommentUpdateMessage: BlogCommentUpdateMessage): BlogCommentResponse {
+        val principal = SecurityContextHolder.getContext().authentication.principal as UserDetails
+        val username = principal.username
+        val authorities = principal.authorities as Set<*>
+
         try {
-            val blog = defaultBlogService.getBlogById(blogCommentUpdateMessage.blogId)
-            val comment = getCommentById(blogCommentUpdateMessage.commentId)
+            val savedBlog = defaultBlogService.getBlogById(blogCommentUpdateMessage.blogId)
+            val savedComment = getCommentById(blogCommentUpdateMessage.commentId)
+            if (username == savedBlog.owner.userName || authorities.contains(SimpleGrantedAuthority(Authorities.ROLE_ADMIN.toString()))) {
 
-            val newComment = Comment(
-                blog.id,
-                comment.commentId,
-                comment.commentOwner,
-                blogCommentUpdateMessage.comment,
-                Date(System.currentTimeMillis())
-            )
-
-            commentRepository.save(newComment)
-
-            defaultBlogService.updateBlog(
-                BlogRequestMessage(
-                    blog.id,
-                    blog.blogTitle,
-                    blog.data,
-                    blog.owner.userName,
-                    blog.blogAccessStatus,
-                    blog.blogCategory,
-                    blog.comments
+                val newComment = Comment(
+                    savedBlog.id,
+                    savedComment.commentId,
+                    savedComment.commentOwner,
+                    blogCommentUpdateMessage.comment,
+                    Date(System.currentTimeMillis())
                 )
-            )
+                savedBlog.comments.remove(savedComment)
 
-            return BlogCommentResponse(comment, "Comment Updated")
-        }catch (e: IllegalArgumentException) {
+                commentRepository.save(newComment)
+
+                savedBlog.comments.add(newComment)
+
+                blogUpdateService.updateBlogComments(UpdateBlogCommentsRequest(savedBlog.id, savedBlog.comments, Action.ADD))
+
+                return BlogCommentResponse(savedComment, "Comment Updated Successfully")
+            } else {
+                throw UserException("Invalid Access")
+            }
+        } catch (e: IllegalArgumentException) {
             e.printStackTrace()
             throw CommentException("An error occurred while updating the comment")
         }
