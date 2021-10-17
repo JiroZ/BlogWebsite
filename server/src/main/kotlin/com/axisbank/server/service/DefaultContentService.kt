@@ -73,30 +73,42 @@ class DefaultContentService(
     }
 
     override fun getAccessableContent(): MutableList<Blog> {
-        val blogIndexes = blogService.getAllBlogIndexes()
         val blogList = mutableListOf<Blog>()
+        val blogIndexes = blogService.getAllBlogIndexes()
+
+        val principal: UserDetails
+        var username: String = ""
+        if(userService.userAuthentication != null) {
+            principal = userService.userAuthentication.principal as UserDetails
+            username = principal.username
+        }
 
         for (blogIndex in blogIndexes) {
             val blog = blogService.getBlogById(blogIndex.blogId)
             when {
-                blog.blogAccessStatus == BlogAccessStatus.PUBLIC -> {
+                !userService.isUserAuthenticated || blog.blogAccessStatus == BlogAccessStatus.PUBLIC -> {
                     blogList.add(blog)
                 }
-                userService.isUserAuthenticated && blog.blogAccessStatus == BlogAccessStatus.PRIVATE -> {
+                userService.isUserAuthenticated && blog.blogAccessStatus == BlogAccessStatus.PRIVATE && username == blog.owner.userName -> {
+                    blogList.add(blog)
+                }
+                blog.blogAccessStatus == BlogAccessStatus.PRIVATE && blog.sharedWith.contains(
+                    publicProfileService.createPublicProfileByUsername(
+                        blog.owner.userName
+                    )
+                ) -> {
                     blogList.add(blog)
                 }
             }
-
         }
         return blogList
     }
 
     override fun getPrivateContent(): MutableList<Blog> {
-        val principal = userService.userAuthentication.principal as UserDetails
-        val username = principal.username
-
         val blogIndexes = blogService.getAllBlogIndexes()
         val blogList = mutableListOf<Blog>()
+        val principal = userService.userAuthentication.principal as UserDetails
+        val username = principal.username
 
         for (blogIndex in blogIndexes) {
             val blog = blogService.getBlogById(blogIndex.blogId)

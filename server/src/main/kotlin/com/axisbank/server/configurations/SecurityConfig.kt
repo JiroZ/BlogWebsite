@@ -26,7 +26,7 @@ class SecurityConfig(
     override fun configure(auth: AuthenticationManagerBuilder) {
         auth.userDetailsService(myUserDetailService)
         auth.inMemoryAuthentication()
-            .withUser("admin").roles("ADMIN", "USER").password("{noop}password");
+            .withUser("admin").roles("ADMIN", "USER").password("{noop}password")
     }
 
     override fun configure(http: HttpSecurity) {

@@ -3,8 +3,7 @@ package com.axisbank.server.service
 import com.axisbank.server.dto.Messages
 import com.axisbank.server.exceptions.UserException
 import com.axisbank.server.service.contracts.UserService
-import org.junit.jupiter.api.Assertions.assertThrows
-import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
@@ -33,7 +32,7 @@ class DefaultUserServiceTest(@Autowired val userService: UserService) {
             userService.registerUser(registrationRequest)
         }
 
-        assertTrue(message.isRegistered)
+        assertFalse(message.isRegistered)
     }
 
     @Test
@@ -45,6 +44,7 @@ class DefaultUserServiceTest(@Autowired val userService: UserService) {
 
     @Test()
     fun `Check if authentication is given wrong data`() {
+        userService.registerUser(registrationRequest)
         assertThrows(UserException::class.java) {
             userService.authUser(authRequest)
         }
