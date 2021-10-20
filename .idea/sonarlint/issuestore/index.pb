@@ -5,3 +5,17 @@ q
 Aserver/src/main/kotlin/com/axisbank/server/authority/Operation.kt,3\1\317da3d190d0d006ae3d8981dca27608fabbe7ad
 l
 <server/src/main/kotlin/com/axisbank/server/authority/Role.kt,3\2\329e1b9077866a427d00b2b6720a88c3b34a96f6
+Z
+*client/src/Main/Elements/Navbar/Navbar.css,5\0\5001557cec9875c374afcef535e47172d690f9aa
+G
+client/src/Main/Home.js,7\a\7a48e6de6324222a40c92be5b2314b627ee1a337
+\
+,client/src/Main/Elements/Navbar/MenuItems.js,c\7\c7ac8d002c9d69ea5a9df20f29778a8e7bbeaf2a
+{
+Kserver/src/main/kotlin/com/axisbank/server/configurations/SecurityConfig.kt,f\f\ff07c9d84ccae880f5ee7248054c50b59ae9e447
+‹
+[server/services/api-gateway/src/main/java/com/example/apigateway/ApiGatewayApplication.java,4\5\452c84fb5d03ce776f77f6ddac062a06da6ec6e0
+S
+#server/services/api-gateway/pom.xml,c\3\c389c6ce6a7d1b3d025e5c2cc740385f48e43973
+x
+Hserver/src/main/kotlin/com/axisbank/server/service/DefaultUserService.kt,9\d\9da17144970688dde35a0509ddb9a85a9202279f

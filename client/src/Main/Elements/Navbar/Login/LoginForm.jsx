@@ -12,11 +12,12 @@ import {CloseUserModel, InitUser, SignIn} from "../../../../Redux/UserLogin/Acti
 const LoginForm = () => {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
+    const [userName, setUserName] = useState('');
     const dispatch = useDispatch();
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        const user = {email, password}
+        const user = {userName ,email, password}
 
         let body = JSON.stringify(user)
 
@@ -46,6 +47,8 @@ const LoginForm = () => {
                     password={password}
                     setEmail={setEmail}
                     setPassword={setPassword}
+                    userName={userName}
+                    setUserName={setUserName}
                 />
                 <Button variant="contained" type='submit' onClick={handleSubmit}> Login </Button>
                 <br/>

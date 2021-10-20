@@ -6,16 +6,36 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="server" />
+        <module name="api-gateway" />
+        <module name="discovery-server" />
+        <module name="user-service" />
+        <module name="blog-service" />
+      </profile>
+      <profile name="Annotation profile for server" enabled="true">
+        <sourceOutputDir name="../target/generated-sources/annotations" />
+        <sourceTestOutputDir name="../target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="services" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
+      <module name="api-gateway" target="11" />
+      <module name="blog-service" target="11" />
+      <module name="discovery-server" target="11" />
       <module name="server" target="16" />
+      <module name="services" target="16" />
+      <module name="untitled" target="16" />
+      <module name="user-service" target="11" />
     </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="api-gateway" options="-parameters" />
+      <module name="blog-service" options="-parameters" />
+      <module name="discovery-server" options="-parameters" />
       <module name="server" options="-parameters" />
+      <module name="services" options="-parameters" />
+      <module name="user-service" options="-parameters" />
     </option>
   </component>
 </project>

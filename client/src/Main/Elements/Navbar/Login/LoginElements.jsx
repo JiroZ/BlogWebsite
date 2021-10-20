@@ -2,7 +2,8 @@ import {Button, TextField} from "@material-ui/core";
 import {useState} from "react";
 
 const LoginElements = (props) => {
-    const [emailError,setEmailError] = useState(false);
+    const [emailError, setEmailError] = useState(false);
+    const [userNameError, setUserNameError] = useState(false);
 
     function handleEmailFieldChange(e) {
         props.setEmail(e.target.value)
@@ -14,12 +15,23 @@ const LoginElements = (props) => {
         }
     }
 
+    function handleUserNameChange(e) {
+        props.setEmail(e.target.value)
+    }
+
     return (
         <>
-            <TextField error={emailError} label="Email" type="email" required value={props.email} onChange={(e) => handleEmailFieldChange(e)}/>
+            <TextField error={userNameError} label="User Name" type="password" required value={props.userName}
+                       onChange={(e) => props.setUserName(e.target.value)}/>
             <br/>
-            <TextField label="Password" type="password" required value={props.password} onChange={(e) => props.setPassword(e.target.value)}/>
+            <TextField error={emailError} label="Email" type="email" required value={props.email}
+                       onChange={(e) => handleEmailFieldChange(e)}/>
             <br/>
+            <TextField label="Password" type="password" required value={props.password}
+                       onChange={(e) => props.setPassword(e.target.value)}/>
+            <br/>
+
+            <label>{props.userName}</label>
             <label>{props.email}</label>
             <label>{props.password}</label>
         </>

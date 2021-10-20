@@ -1,0 +1,21 @@
+server:
+  port: 8989
+
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+      routes:
+        - id: blog-service
+          uri: lb://BLOG-SERVICE
+          predicates:
+            - Path=/blog/**
+        - id: user-service
+          uri: lb://USER-SERVICE
+          predicates:
+            - Path=/user/**

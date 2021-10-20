@@ -9,6 +9,10 @@
     <option name="originalFiles">
       <list>
         <option value="$PROJECT_DIR$/server/pom.xml" />
+        <option value="$PROJECT_DIR$/server/services/blog-service/pom.xml" />
+        <option value="$PROJECT_DIR$/server/services/discovery-server/pom.xml" />
+        <option value="$PROJECT_DIR$/server/services/api-gateway/pom.xml" />
+        <option value="$PROJECT_DIR$/server/services/user-service/pom.xml" />
       </list>
     </option>
   </component>
