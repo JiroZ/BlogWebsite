@@ -10,24 +10,28 @@ import com.bloggie.blogservice.repository.BlogIndexRepository
 import com.bloggie.blogservice.repository.BlogRepository
 import com.bloggie.blogservice.service.contracts.BlogService
 import com.bloggie.blogservice.service.contracts.PublicProfileService
+import com.bloggie.blogservice.utils.Routes
 import org.bson.types.ObjectId
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.stereotype.Service
+import org.springframework.web.reactive.function.client.WebClient
 import java.util.*
 
 
 @Service
 class DefaultBlogService(
-    val blogRepository: BlogRepository
+    val blogRepository: BlogRepository,
     val publicProfileService: PublicProfileService,
-    val blogIndexRepository: BlogIndexRepository
+    val blogIndexRepository: BlogIndexRepository,
+    val webClient: WebClient.Builder,
+    val requestService: RequestService
 ) : BlogService {
-
     @Throws(UserException::class)
     override fun createBlog(blogRequestMessage: BlogCreateRequestMessage): BlogCreationMessage {
-        val blogUser = userService.getBlogUserByUsername(blogRequestMessage.userName)
+        val blogUser = requestService.getUserByUsername(blogRequestMessage.userName)
+
         val id = ObjectId().toString()
         val blog = Blog(
             id,
@@ -51,8 +55,6 @@ class DefaultBlogService(
         blogRepository.insert(blog)
         blogIndexRepository.insert(blogIndex)
 
-        userService.updateUserBlogByUserName(blogUser.userName, blog)
-
         return BlogCreationMessage(true, id, "Blog Created Successfully")
     }
 
@@ -68,7 +70,13 @@ class DefaultBlogService(
             if (username == savedBlog.owner.userName || authorities.contains(SimpleGrantedAuthority(Authorities.ROLE_ADMIN.toString()))) {
                 blogRepository.delete(savedBlog)
                 blogIndexRepository.delete(savedBlogIndex)
-                userService.deleteBlogFromUser(blogCallMessage.userName, savedBlog)
+
+                webClient.build() //  userService.deleteBlogFromUser(blogCallMessage.userName, savedBlog)
+                    .delete()
+                    .uri(Routes.USER_SERVICE + "user/blog" + savedBlogIndex.blogId)
+                    .retrieve()
+                    .bodyToMono(BlogUpdateRequest::class.java)
+                    .block()
 
                 return BlogDeletionMessage(true, "Blog ${savedBlog.blogTitle} deleted successfully")
             } else {

@@ -34,12 +34,6 @@ const RegisterElements = (props) => {
 
     function handlePasswordChange(e) {
         props.setPassword(e.target.value)
-
-        // if (!(e.target.value.match())) {
-        //     setPasswordError(true)
-        // } else {
-        //     setPasswordError(false)
-        // }
     }
 
     function handleConfirmPasswordChange(e) {
@@ -59,9 +53,15 @@ const RegisterElements = (props) => {
 
     return (
         <>
+            <TextField error={error} label="User Name" type="userName" onChange={(e) => handleEmailChange(e)} required
+                       value={props.userName}/>
+
+            <TextField error={confirmEmailError} label="Confirm User Name" type="userName" required value={props.confirmUserName}
+                       onChange={(e) => handleConfirmEmailChange(e)}/>
+            <br/>
             <TextField error={error} label="Email" type="email" onChange={(e) => handleEmailChange(e)} required
                        value={props.email}/>
-            <br/>
+
             <TextField error={confirmEmailError} label="Confirm Email" type="email" required value={props.confirmEmail}
                        onChange={(e) => handleConfirmEmailChange(e)}/>
             <br/>
@@ -69,7 +69,6 @@ const RegisterElements = (props) => {
                        type="password"
                        required value={props.password}
                        onChange={(e) => handlePasswordChange(e)}/>
-            <br/>
             <TextField error={passwordConfirmError} label="Confirm Password" type='password' required
                        value={props.confirmPassword}
                        onChange={(e) => handleConfirmPasswordChange(e)}/>

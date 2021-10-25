@@ -64,6 +64,7 @@ class DefaultUserService(
                     throw UserException("Your Account is disabled")
                 }
                 is InternalAuthenticationServiceException -> {
+                    e.printStackTrace()
                     throw UserException("User Account does not exists")
                 }
                 else -> throw e

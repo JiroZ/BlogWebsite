@@ -33,7 +33,9 @@ open class SecurityConfig(
 
     override fun configure(http: HttpSecurity) {
         http.csrf().disable()
-            .authorizeRequests().antMatchers("/blog/**", "/private").authenticated()
+            .authorizeRequests()
+            .antMatchers("/**").hasIpAddress("127.0.0.1")
+            .antMatchers("/blog/**", "/private").authenticated()
             .antMatchers("/user", "/blog", "/user/delete/{\\\\d+}").hasAuthority(Authorities.ROLE_ADMIN.toString())
             .anyRequest().permitAll()
             .and()

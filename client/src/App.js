@@ -1,10 +1,15 @@
 import './App.css';
-import Navbar from "./Main/Elements/Navbar/Navbar";
+import NavbarRouter from "./Main/Elements/Navbar/NavbarRouter.jsx"
+
+import TestComponent from "./TestComponent";
+
+import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 
 function App() {
   return (
     <div className="App">
-        <Navbar signedIn={false}/>
+        <NavbarRouter/>
+        <TestComponent/>
     </div>
   );
 }

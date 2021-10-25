@@ -17,18 +17,18 @@ import org.springframework.stereotype.Service
 import java.util.*
 
 @Service
-class DefaultCommentService(
-    val userService: DefaultUserService,
+open class DefaultCommentService(
     val commentRepository: CommentRepository,
     val publicProfileService: DefaultPublicProfileService,
     val defaultBlogService: DefaultBlogService,
     val blogUpdateService: DefaultBlogUpdateManagementService,
+    val requestService: RequestService
 ) : CommentService {
 
     @Throws(CommentException::class, UserException::class, BlogException::class)
     override fun addComment(blogCommentCreateMessage: BlogCommentCreateMessage): BlogCommentResponse {
         try {
-            val commentUser = userService.getUserByUsername(blogCommentCreateMessage.userName)
+            val commentUser = requestService.getUserByUsername(blogCommentCreateMessage.userName)
 
             val savedBlog = defaultBlogService.getBlogById(blogCommentCreateMessage.blogId)
 

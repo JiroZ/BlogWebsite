@@ -1,6 +1,5 @@
 package com.bloggie.userservice.controller
 
-
 import com.bloggie.userservice.dto.Messages.*
 import com.bloggie.userservice.exceptions.BlogException
 import com.bloggie.userservice.exceptions.CommentException

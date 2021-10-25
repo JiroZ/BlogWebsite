@@ -1,5 +1,6 @@
 package com.bloggie.blogservice.dto
 
+import com.bloggie.blogservice.dto.blog.BlogIndex
 import com.bloggie.blogservice.dto.blog.Comment
 import com.bloggie.blogservice.dto.user.BlogUser
 import com.bloggie.blogservice.dto.user.PublicProfile
@@ -56,6 +57,11 @@ open class Messages {
         val userName: String,
         val password: String
     )
+
+    data class BlogUpdateRequest(
+        val blogId: String,
+        val user: String
+        )
 
     data class BlogRequestMessage(
         val id: String,
@@ -132,6 +138,10 @@ open class Messages {
     data class UpdateBlogSharedWithRequest(
         val blogId: String,
         val listOfSharedWith: MutableList<PublicProfile>
+    )
+
+    data class BlogIndexesResponse(
+        val blogIndexes: MutableList<BlogIndex>
     )
 
 }

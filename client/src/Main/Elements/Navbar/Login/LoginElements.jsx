@@ -15,18 +15,27 @@ const LoginElements = (props) => {
         }
     }
 
+    function handleUserNameFieldChange(e) {
+        props.setUserName(e.target.value)
+        if(!(e.target.value.match("^[A-Za-z0-9]{1,10}$"))) {
+            setUserNameError(true)
+        } else {
+            setUserNameError(false)
+        }
+    }
+
+
+
     function handleUserNameChange(e) {
         props.setEmail(e.target.value)
     }
 
     return (
         <>
-            <TextField error={userNameError} label="User Name" type="password" required value={props.userName}
+            <TextField error={userNameError} label="User Name" type="userName" required value={props.userName}
                        onChange={(e) => props.setUserName(e.target.value)}/>
             <br/>
-            <TextField error={emailError} label="Email" type="email" required value={props.email}
-                       onChange={(e) => handleEmailFieldChange(e)}/>
-            <br/>
+
             <TextField label="Password" type="password" required value={props.password}
                        onChange={(e) => props.setPassword(e.target.value)}/>
             <br/>

@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 @RequestMapping(value = ["/blog/update"])
 @Validated
-class BlogUpdateManagementController(val blogUpdateService: BlogUpdateService) {
+open class BlogUpdateManagementController(val blogUpdateService: BlogUpdateService) {
     @PatchMapping("/access")
     fun updateBlogAccessStatus(
         @RequestBody updateBlogAccessStatusRequest: UpdateBlogAccessStatusRequest,

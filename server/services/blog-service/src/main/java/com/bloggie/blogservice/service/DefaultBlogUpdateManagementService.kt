@@ -25,7 +25,6 @@ class DefaultBlogUpdateManagementService(
         val username = principal.username
         val authorities = principal.authorities as Set<*>
 
-
         val savedBlog = blogService.getBlogById(updateBlogAccessStatusRequest.blogId)
 
         if (username == savedBlog.owner.userName || authorities.contains(SimpleGrantedAuthority(Authorities.ROLE_ADMIN.toString()))) {

@@ -9,30 +9,25 @@ import com.bloggie.blogservice.service.DefaultBlogService
 import com.bloggie.blogservice.service.DefaultCommentService
 import org.springframework.http.ResponseEntity
 import org.springframework.validation.BindingResult
-import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
 
 @CrossOrigin
 @RestController
 @RequestMapping(value = ["/blog"])
-@Validated
 class BlogController(
     val blogService: DefaultBlogService,
-    val commentService: DefaultCommentService
+    private val commentService: DefaultCommentService
 ) {
     @GetMapping
-    fun getAllBlogs(): ResponseEntity<MutableList<Blog>> {
-        return ResponseEntity.ok(blogService.getAllBlogs())
+    fun getAllBlogs(): MutableList<Blog> {
+        return blogService.getAllBlogs()
     }
 
     @GetMapping("/{id}")
-    @Throws(UserException::class, BlogException::class, CommentException::class)
+    @Throws(BlogException::class)
     fun getBlog(
-        @PathVariable id: String,
-        bindingResult: BindingResult
+        @PathVariable id: String
     ): ResponseEntity<Blog> {
-        bindErrorResult(bindingResult)
-
         val message = blogService.getBlogById(id)
         return ResponseEntity.ok(message)
     }
@@ -92,6 +87,12 @@ class BlogController(
 
         val message = commentService.updateComment(updateCommentMessage)
         return ResponseEntity.ok(message)
+    }
+
+    @GetMapping("/indexes")
+    @Throws(UserException::class, BlogException::class, CommentException::class)
+    fun getAllBlogIndexes() : ResponseEntity<BlogIndexesResponse> {
+        return ResponseEntity.ok(BlogIndexesResponse(blogService.getAllBlogIndexes()))
     }
 
     private fun bindErrorResult(bindingResult: BindingResult) {

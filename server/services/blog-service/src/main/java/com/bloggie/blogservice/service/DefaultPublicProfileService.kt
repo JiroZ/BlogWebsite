@@ -6,20 +6,18 @@ import com.bloggie.blogservice.service.contracts.PublicProfileService
 import org.springframework.stereotype.Service
 
 @Service
-class DefaultPublicProfileService(
-    val userService: DefaultUserService
+class DefaultPublicProfileService( val requestService: RequestService
 ) : PublicProfileService {
     @Throws(UserException::class)
     override fun createPublicProfileByUsername(username: String): PublicProfile {
-        val blogUser = userService.getUserByUsername(username)
+        val blogUser = requestService.getUserByUsername(username)
 
         return PublicProfile(username, blogUser.email, getBlogCountByUsername(username))
     }
 
     @Throws(UserException::class)
     override fun getBlogCountByUsername(username: String): Int {
-        val blogUser = userService.getUserByUsername(username)
-
+        val blogUser = requestService.getUserByUsername(username)
         return blogUser.blogs.size
     }
 }

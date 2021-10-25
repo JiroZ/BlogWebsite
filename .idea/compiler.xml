@@ -10,6 +10,7 @@
         <module name="discovery-server" />
         <module name="user-service" />
         <module name="blog-service" />
+        <module name="content-service" />
       </profile>
       <profile name="Annotation profile for server" enabled="true">
         <sourceOutputDir name="../target/generated-sources/annotations" />
@@ -21,6 +22,7 @@
     <bytecodeTargetLevel>
       <module name="api-gateway" target="11" />
       <module name="blog-service" target="11" />
+      <module name="content-service" target="11" />
       <module name="discovery-server" target="11" />
       <module name="server" target="16" />
       <module name="services" target="16" />
@@ -32,6 +34,7 @@
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="api-gateway" options="-parameters" />
       <module name="blog-service" options="-parameters" />
+      <module name="content-service" options="-parameters" />
       <module name="discovery-server" options="-parameters" />
       <module name="server" options="-parameters" />
       <module name="services" options="-parameters" />

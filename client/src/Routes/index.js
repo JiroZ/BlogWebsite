@@ -1,12 +1,12 @@
 let port = 8080;
-let host = 'locahost';
+let host = 'localhost';
 
 const authRoute = () =>  {
-    return "http://"+host+":"+port+"/users/auth"
+    return "http://"+host+":"+port+"/user/auth"
 }
 
 const registrationRoute = () => {
-    return "http://"+host+":"+port+"/users/registration"
+    return "http://"+host+":"+port+"/user/registration"
 }
 
 export {

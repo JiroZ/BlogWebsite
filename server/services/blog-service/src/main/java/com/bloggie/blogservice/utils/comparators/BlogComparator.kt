@@ -1,7 +1,6 @@
 package com.axisbank.server.utils.comparators
 
-import com.axisbank.server.dto.blog.Blog
-import com.axisbank.server.dto.blog.BlogIndex
+import com.bloggie.blogservice.dto.blog.BlogIndex
 
 class BlogComparator() : Comparator<BlogIndex>{
     override fun compare(o1: BlogIndex, o2: BlogIndex): Int {

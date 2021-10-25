@@ -1,4 +1,3 @@
-import {Button, Modal} from "@material-ui/core";
 import {useState} from "react";
 
 import RegisterBody from '../Register/RegisterForm'
@@ -6,8 +5,9 @@ import LoginBody from '../Login/LoginForm'
 
 import {useDispatch, useSelector} from "react-redux";
 
-import './UserModel.css'
 import {CloseUserModel, OpenUserModel} from "../../../../Redux/UserLogin/Actions";
+
+import {Modal, Navbar, Nav, Container, Button} from 'react-bootstrap';
 
 const UserModel = () => {
     const [isLoginModel, setLoginModel] = useState(true);
@@ -24,8 +24,6 @@ const UserModel = () => {
             console.log("Register");
             //Todo: Send Register Request
         } else {
-            // MainModelBody.setState(RegisterBody);
-
             setLoginModel(false);
         }
     }
@@ -35,7 +33,6 @@ const UserModel = () => {
             console.log("Login");
             //Todo: send Sign in request
         } else {
-            // MainModelBody.setState(LoginBody);
             setLoginModel(true);
         }
     }
@@ -50,32 +47,50 @@ const UserModel = () => {
 
     return (
         <>
-            {isUserAuthenticated ?
-                <div><label>Welcome {userEmail}</label><Button className="userActionButton"> + </Button></div> :
-                <Button className="userActionButton" onClick={handleUserModel}>
-                    Sign In
-                </Button>}
+            {
+                isUserAuthenticated ?
+                    <div><label>Welcome {userEmail}</label><Button className="userActionButton"> + </Button></div> :
 
+                    <Nav.Link className="userActionButton" onClick={handleUserModel}>
+                        Sign In
+                    </Nav.Link>
+            }
+
+            {/*<Modal*/}
+            {/*    open={isModelOpen}*/}
+            {/*    disablePortal*/}
+            {/*    disableEnforceFocus*/}
+            {/*    disableAutoFocus*/}
+            {/*    aria-labelledby="simple-modal-title"*/}
+            {/*    aria-describedby="simple-modal-description"*/}
+            {/*>*/}
             <Modal
-                open={isModelOpen}
-                disablePortal
-                disableEnforceFocus
-                disableAutoFocus
-                aria-labelledby="simple-modal-title"
-                aria-describedby="simple-modal-description"
+                show={isModelOpen}
+                onHide={() => handleCloseModel}
+                dialogClassName="modal-90w"
+                aria-labelledby="example-custom-modal-styling-title"
             >
-
-                <div className="userModel">
-                    <div className='taskBar'>
+                <Modal.Header>
+                    <Modal.Title id="example-custom-modal-styling-title">
                         <label className='titleName'>{isLoginModel ? "Login" : "Register"}</label>
-                        <Button onClick={handleCloseModel}><i className="fas fa-times"/></Button>
-                    </div>
-                    <div className='modelBody'>
-                        {isLoginModel ? <LoginBody/> : <RegisterBody/>}
-                    </div>
-                    <Button variant="contained" onClick={handleRegister}>Register</Button>
-                    <Button variant="contained" onClick={handleSignIn}>Sign In</Button>
-                </div>
+                        <Button onClick={handleCloseModel}><i className="fas fa-times"/>X</Button>
+                    </Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                        <div className='taskBar'>
+                        </div>
+                        <div className='modelBody'>
+                            {isLoginModel ? <LoginBody/> : <RegisterBody/>}
+                        </div>
+                        {isLoginModel ?
+                            <label>Don't have a account?</label>:
+                            <label>Have a account?</label>
+                        }
+                        {isLoginModel ?
+                            <Button variant="contained" onClick={handleRegister}>Register</Button> :
+                            <Button variant="contained" onClick={handleSignIn}>Sign In</Button>
+                        }
+                </Modal.Body>
             </Modal>
         </>
     );
