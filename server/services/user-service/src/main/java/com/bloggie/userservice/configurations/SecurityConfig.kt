@@ -6,7 +6,6 @@ import com.bloggie.userservice.service.DefaultUserDetailService
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Primary
-import org.springframework.data.mongodb.core.mapping.MongoMappingContext
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
@@ -17,12 +16,11 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
 import org.springframework.web.reactive.function.client.WebClient
 
-
 @Configuration
 @EnableWebSecurity
 open class SecurityConfig(
-    val myUserDetailService: DefaultUserDetailService,
-    val jwtRequestFilter: JwtRequestFilter
+    private val myUserDetailService: DefaultUserDetailService,
+    private val jwtRequestFilter: JwtRequestFilter,
 ) : WebSecurityConfigurerAdapter() {
 
     override fun configure(auth: AuthenticationManagerBuilder) {

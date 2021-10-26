@@ -7,7 +7,7 @@ import {useDispatch, useSelector} from "react-redux";
 
 import {CloseUserModel, OpenUserModel} from "../../../../Redux/UserLogin/Actions";
 
-import {Modal, Navbar, Nav, Container, Button} from 'react-bootstrap';
+import {Modal, Nav, Button} from 'react-bootstrap';
 
 const UserModel = () => {
     const [isLoginModel, setLoginModel] = useState(true);
@@ -55,15 +55,6 @@ const UserModel = () => {
                         Sign In
                     </Nav.Link>
             }
-
-            {/*<Modal*/}
-            {/*    open={isModelOpen}*/}
-            {/*    disablePortal*/}
-            {/*    disableEnforceFocus*/}
-            {/*    disableAutoFocus*/}
-            {/*    aria-labelledby="simple-modal-title"*/}
-            {/*    aria-describedby="simple-modal-description"*/}
-            {/*>*/}
             <Modal
                 show={isModelOpen}
                 onHide={() => handleCloseModel}
@@ -77,19 +68,19 @@ const UserModel = () => {
                     </Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                        <div className='taskBar'>
-                        </div>
-                        <div className='modelBody'>
-                            {isLoginModel ? <LoginBody/> : <RegisterBody/>}
-                        </div>
-                        {isLoginModel ?
-                            <label>Don't have a account?</label>:
-                            <label>Have a account?</label>
-                        }
-                        {isLoginModel ?
-                            <Button variant="contained" onClick={handleRegister}>Register</Button> :
-                            <Button variant="contained" onClick={handleSignIn}>Sign In</Button>
-                        }
+                    <div className='taskBar'>
+                    </div>
+                    <div className='modelBody'>
+                        {isLoginModel ? <LoginBody/> : <RegisterBody/>}
+                    </div>
+                    {isLoginModel ?
+                        <label>Don't have a account?</label> :
+                        <label>Have a account?</label>
+                    }
+                    {isLoginModel ?
+                        <Button variant="contained" onClick={handleRegister}>Register</Button> :
+                        <Button variant="contained" onClick={handleSignIn}>Sign In</Button>
+                    }
                 </Modal.Body>
             </Modal>
         </>

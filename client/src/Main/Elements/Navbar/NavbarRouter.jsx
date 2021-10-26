@@ -1,7 +1,5 @@
 import NavbarMain from './NavbarMain.jsx'
 import {BrowserRouter as Router, Route, Switch} from "react-router-dom";
-import Home from "./Components/Home";
-
 import {MenuItems} from "./Components/MenuItems";
 
 const NavbarRouter = () => {
@@ -13,11 +11,10 @@ const NavbarRouter = () => {
                     {
                         MenuItems.map((item, index) => {
                             return (
-                                <Route path={item.url} exact component={Home}/>
+                                <Route path={item.url} exact component={item.component}/>
                             )
                         })
                     }
-                    {/*<Route path='/' exact component={Home}/>*/}
                 </Switch>
             </Router>
         </>

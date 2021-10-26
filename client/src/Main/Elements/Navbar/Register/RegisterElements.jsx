@@ -1,10 +1,12 @@
-import {Button, TextField} from "@material-ui/core";
+import {TextField} from "@material-ui/core";
 import {useState} from "react";
 
 const RegisterElements = (props) => {
+    const [userNameError, setUserNameError] = useState(false);
+    const [userNameConfirmError, setUserNameConfirmError] = useState(false);
     const [error, setError] = useState(false)
     const [confirmEmailError, setConfirmEmailError] = useState(false);
-    const [passwordError, setPasswordError] = useState(false);
+    const [passwordError] = useState(false);
     const [passwordConfirmError, setPasswordConfirmError] = useState(false);
 
     function handleEmailChange(e) {
@@ -14,6 +16,30 @@ const RegisterElements = (props) => {
             setError(true)
         } else {
             setError(false)
+        }
+    }
+
+    function handleUserNameFieldChange(e) {
+        props.setUserName(e.target.value)
+        if (!(e.target.value.match("^[A-Za-z0-9]{3,14}$"))) {
+            setUserNameError(true)
+        } else {
+            setUserNameError(false)
+        }
+    }
+
+    function handleUserNameConfirmFieldChange(e) {
+        props.setConfirmUserName(e.target.value)
+
+        const matches = props.userName === props.confirmUserName
+
+        console.log(matches)
+        console.log(props.email, props.confirmEmail)
+
+        if (!(matches)) {
+            setUserNameConfirmError(true)
+        } else {
+            setUserNameConfirmError(false)
         }
     }
 
@@ -53,13 +79,16 @@ const RegisterElements = (props) => {
 
     return (
         <>
-            <TextField error={error} label="User Name" type="userName" onChange={(e) => handleEmailChange(e)} required
+            <TextField error={userNameError} label="User Name" type="userName"
+                       onChange={(e) => handleUserNameFieldChange(e)} required
                        value={props.userName}/>
 
-            <TextField error={confirmEmailError} label="Confirm User Name" type="userName" required value={props.confirmUserName}
-                       onChange={(e) => handleConfirmEmailChange(e)}/>
+            <TextField error={userNameConfirmError} label="Confirm User Name" type="userName" required
+                       value={props.confirmUserName}
+                       onChange={(e) => handleUserNameConfirmFieldChange(e)}/>
             <br/>
-            <TextField error={error} label="Email" type="email" onChange={(e) => handleEmailChange(e)} required
+            <TextField error={error} label="Email" type="email" onChange={(e) => handleEmailChange(e)}
+                       required
                        value={props.email}/>
 
             <TextField error={confirmEmailError} label="Confirm Email" type="email" required value={props.confirmEmail}

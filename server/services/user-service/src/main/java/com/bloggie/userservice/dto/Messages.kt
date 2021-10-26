@@ -53,7 +53,6 @@ open class Messages {
     )
 
     data class UserAuthRequest(
-        val email: String,
         val userName: String,
         val password: String
     )

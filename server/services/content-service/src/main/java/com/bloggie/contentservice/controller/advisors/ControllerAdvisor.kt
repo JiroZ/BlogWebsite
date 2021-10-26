@@ -1,4 +1,4 @@
-package com.axisbank.server.controller.advisors
+package com.bloggie.contentservice.controller.advisors
 
 import com.bloggie.contentservice.exceptions.BlogException
 import com.bloggie.contentservice.exceptions.CommentException

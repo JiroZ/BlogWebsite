@@ -10,17 +10,12 @@ import org.springframework.validation.BindingResult
 import org.springframework.web.bind.annotation.*
 import javax.validation.Valid
 
-@CrossOrigin
+
 @RestController
-@RequestMapping(value = ["/user"])
 class UserController(
     private val userService: DefaultUserService
 ) {
-    @RequestMapping(
-        value = ["/auth"],
-        method = [RequestMethod.POST],
-        consumes = ["application/json"]
-    )
+    @PostMapping("/user/auth")
     @Throws(UserException::class, BlogException::class, CommentException::class)
     fun authenticateUser(
         @RequestBody userAuthRequest: UserAuthRequest,
@@ -32,11 +27,7 @@ class UserController(
         return ResponseEntity.ok(userUserAuthResponse)
     }
 
-    @RequestMapping(
-        value = ["/registration"],
-        method = [RequestMethod.POST],
-        consumes = ["application/json"]
-    )
+    @PostMapping("/user/registration" )
     @Throws(UserException::class, BlogException::class, CommentException::class)
     private fun registerUser(
         @Valid @RequestBody userRegistrationRequest: UserRegistrationRequest,

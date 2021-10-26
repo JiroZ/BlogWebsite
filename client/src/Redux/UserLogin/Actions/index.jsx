@@ -14,10 +14,10 @@ const SignIn = () => {
     }
 }
 
-const InitUser = (user) => {
+const InitAuthResponse = (authResponse) => {
     return {
         type: 'LOGGED_IN',
-        userData: user
+        userAuthResponse: authResponse
     }
 }
 
@@ -25,5 +25,5 @@ export {
     OpenUserModel,
     CloseUserModel,
     SignIn,
-    InitUser
+    InitAuthResponse
 }

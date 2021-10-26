@@ -5,6 +5,9 @@
       <item index="0" class="java.lang.String" itemvalue="org.springframework.web.bind.annotation.GetMapping" />
     </list>
   </component>
+  <component name="JavaScriptSettings">
+    <option name="languageLevel" value="FLOW" />
+  </component>
   <component name="MavenProjectsManager">
     <option name="originalFiles">
       <list>

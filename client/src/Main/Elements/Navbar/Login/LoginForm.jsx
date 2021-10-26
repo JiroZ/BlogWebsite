@@ -5,47 +5,46 @@ import {Button, FormControl} from "@material-ui/core";
 
 import axios from 'axios'
 
-import  {useDispatch, useSelector} from "react-redux";
-import {CloseUserModel, InitUser, SignIn} from "../../../../Redux/UserLogin/Actions";
+import  {useDispatch} from "react-redux";
+import {CloseUserModel, InitAuthResponse, SignIn} from "../../../../Redux/UserLogin/Actions";
 
 
 const LoginForm = () => {
-    const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [userName, setUserName] = useState('');
     const dispatch = useDispatch();
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        const user = {userName ,email, password}
+        const user = {userName, password}
 
         let body = JSON.stringify(user)
+        console.log(user)
 
         const config = {
             headers: {
                 'Content-Type': 'application/JSON'
             }
-        };
+        }
 
-        console.log(user)
-
-        axios.post('http://localhost:8080/users/auth', body, config).then(response => {
+        axios.post(`http://localhost:8989/user/auth`, body, config).then(response => {
             console.log(response)
             if(response.data.authenticated) {
-                dispatch(InitUser(response.data))
+                dispatch(InitAuthResponse(response.data))
                 dispatch(SignIn())
                 dispatch(CloseUserModel())
             }
-        })
+        }).catch((err) => {
+            console.warn('error during http call', err);
+            console.warn('error during http call Response: ', err.response);
+        });
     };
 
     return (
         <div className="form">
             <FormControl noValidate autoComplete="off" onSubmit={handleSubmit}>
                 <LoginElements
-                    email={email}
                     password={password}
-                    setEmail={setEmail}
                     setPassword={setPassword}
                     userName={userName}
                     setUserName={setUserName}
