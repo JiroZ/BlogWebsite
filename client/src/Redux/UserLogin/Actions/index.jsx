@@ -21,6 +21,8 @@ const InitAuthResponse = (authResponse) => {
     }
 }
 
+
+
 export {
     OpenUserModel,
     CloseUserModel,

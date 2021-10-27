@@ -3,6 +3,7 @@ import UserModel from './Models/UserModel'
 import './Navbar.css'
 import {Navbar, Nav, Container, FormControl, Form, Button} from 'react-bootstrap';
 import axios from "axios";
+import React from "react";
 
 const handleSearch = (e) => {
     const category = 'ALL'
@@ -58,11 +59,17 @@ const NavbarMain = () => {
                         </Form>
                         <Nav>
                             {
-                                MenuItems.map((item, index) => {
-                                    return (
-                                        <Nav.Link href={item.url}>{item.title}</Nav.Link>
-                                    )
-                                })
+
+                                        MenuItems.map((item, index) => {
+                                                return (
+
+                                                    <li key={index}>
+                                                        <Nav.Link href={item.url}>{item.title}</Nav.Link>
+                                                    </li>
+                                                )
+                                            }
+                                        )
+
                             }
                         </Nav>
                     </Navbar.Collapse>
@@ -73,6 +80,14 @@ const NavbarMain = () => {
                     <UserModel/>
                 </Navbar.Text>
             </Navbar>
+            <div
+                style={{
+                    display: 'flex',
+                    justifyContent: 'Center',
+                    alignItems: 'Right',
+                    height: '10vh'
+                }}
+            />
         </>
     );
 }

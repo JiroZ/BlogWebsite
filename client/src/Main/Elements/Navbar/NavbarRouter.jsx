@@ -11,7 +11,9 @@ const NavbarRouter = () => {
                     {
                         MenuItems.map((item, index) => {
                             return (
-                                <Route path={item.url} exact component={item.component}/>
+                                <li key={index}>
+                                    <Route path={item.url} exact component={item.component}/>
+                                </li>
                             )
                         })
                     }

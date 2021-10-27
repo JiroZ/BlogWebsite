@@ -1,56 +1,79 @@
-import {useState} from 'react';
 import APIService from '../../../../Services/APIService.jsx'
-import {Card} from "react-bootstrap";
+import {Card, Col, Row} from "react-bootstrap";
+import React from 'react'
+import './HomeComponent.css'
 
-const HomeComponent = () => {
-    let data = useState(Array)
-    APIService.getAccessibleData().then(response => {
-        console.log(response.data)
-        data = response.data
-    })
+class HomeComponent extends React.Component {
 
-    const category = 'ALL'
-    const searchString = 'test'
-    const search = [searchString, category]
+    constructor(props) {
+        super(props);
+        this.state = {
+            homeData: []
+        }
+    }
 
-    APIService.getSearchedData(search).then(response => {
-        console.log("Searched data" + response)
-    }).catch(err => {
-        console.warn("Error while fetching searched data : " + err)
-    })
+    componentDidMount() {
+        APIService.getAccessibleData()
+            .then(response => {
+                this.setState({homeData: response.data})
+            }).catch(function (ex) {
+            console.log('Response parsing failed. Error: ', ex);
+        });
 
-    return (
-        <>
-            <div
-                style={{
-                    display: 'flex',
-                    justifyContent: 'Center',
-                    alignItems: 'Right',
-                    height: '10vh'
-                }}
-            >
 
-            </div>
+        const category = 'ALL'
+        const searchString = 'test'
+        const search = [searchString, category]
 
-            {
-                data.map(blogData => {
-                    return (
-                        <Card key={blogData.id} className="bg-dark text-white">
-                            <Card.Img src="holder.js/100px270" alt="Card image" />
-                            <Card.ImgOverlay>
-                                <Card.Title>Card title</Card.Title>
-                                <Card.Text>
-                                    This is a wider card with supporting text below as a natural lead-in to
-                                    additional content. This content is a little bit longer.
-                                </Card.Text>
-                                <Card.Text>Last updated 3 mins ago</Card.Text>
-                            </Card.ImgOverlay>
-                        </Card>
-                    )
-                })
-            }
-        </>
-    )
+        APIService.getSearchedData(search).then(response => {
+            console.log("Searched data" + response)
+        }).catch(err => {
+            console.warn("Error while fetching searched data : " + err)
+        })
+    }
+
+    render() {
+        return (
+            <>
+                <div class=' centered contentContainer'>
+                    <div>
+                        {
+                            <Row xs={1} md={2} className="g-4">
+                                {Array.from({length: 1}).map((_, idx) => (
+                                    this.state.homeData.map(blogData => {
+                                        {
+                                            return (
+                                                <Col>
+                                                    {
+
+                                                        <Card key={blogData.id} className="bg-dark text-white">
+                                                            <Card.Img
+                                                                src="https://image.shutterstock.com/image-vector/set-100-geometric-shapes-memphis-260nw-1511671634.jpg"
+                                                                alt="Card image"/>
+
+                                                            <Card.Title>{blogData.blogTitle}</Card.Title>
+                                                            <Card.Text style={{width: 100}}>
+                                                                {blogData.data}
+                                                            </Card.Text>
+
+                                                            <Card.Footer>
+                                                                <Card.Text>{"Added on " + blogData.date.substring(0, 10).replaceAll('-', "/")}</Card.Text>
+                                                            </Card.Footer>
+                                                        </Card>
+                                                    }
+                                                </Col>
+                                            )
+                                        }
+                                    })
+                                ))}
+                            </Row>
+                        }
+                    </div>
+                </div>
+            </>
+        )
+    }
 }
+
 export default HomeComponent
 
