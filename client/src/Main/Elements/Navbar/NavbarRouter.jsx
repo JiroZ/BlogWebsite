@@ -1,6 +1,8 @@
 import NavbarMain from './NavbarMain.jsx'
 import {BrowserRouter as Router, Route, Switch} from "react-router-dom";
 import {MenuItems} from "./Components/MenuItems";
+import CreateBlogForm from "../../Pages/CreateBlogForm";
+import Blog from "../../blog";
 
 const NavbarRouter = () => {
     return (
@@ -11,12 +13,13 @@ const NavbarRouter = () => {
                     {
                         MenuItems.map((item, index) => {
                             return (
-                                <li key={index}>
-                                    <Route path={item.url} exact component={item.component}/>
-                                </li>
+                                <Route key={index} path={item.url} exact component={item.component}/>
                             )
                         })
                     }
+
+                    <Route path='/blog/create' component={CreateBlogForm}/>
+                    <Route path="/blog/:id" component={Blog}><Blog/></Route>
                 </Switch>
             </Router>
         </>

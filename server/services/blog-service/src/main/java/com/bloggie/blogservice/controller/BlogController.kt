@@ -2,6 +2,8 @@ package com.bloggie.blogservice.controller
 
 import com.bloggie.blogservice.dto.Messages.*
 import com.bloggie.blogservice.dto.blog.Blog
+import com.bloggie.blogservice.dto.blog.Comment
+import com.bloggie.blogservice.entities.BlogAccessStatus
 import com.bloggie.blogservice.exceptions.BlogException
 import com.bloggie.blogservice.exceptions.CommentException
 import com.bloggie.blogservice.exceptions.UserException
@@ -32,6 +34,11 @@ class BlogController(
         return ResponseEntity.ok(message)
     }
 
+    @GetMapping("/accesses")
+    fun getBlogAccesses(): ResponseEntity<Array<BlogAccessStatus>> {
+        return ResponseEntity.ok(BlogAccessStatus.values())
+    }
+
     @DeleteMapping("/delete")
     @Throws(UserException::class, BlogException::class, CommentException::class)
     fun deleteBlog(
@@ -44,11 +51,18 @@ class BlogController(
         return ResponseEntity.ok(message)
     }
 
+    @GetMapping("/comment/{commentId}")
+    fun getComment(@PathVariable commentId:String): ResponseEntity<Comment> {
+        return ResponseEntity.ok(commentService.getComment(commentId))
+    }
+
     @PostMapping("/create")
     @Throws(UserException::class, BlogException::class, CommentException::class)
-    fun createBlog(@RequestBody blog: BlogCreateRequestMessage, bindingResult: BindingResult): ResponseEntity<BlogCreationMessage> {
+    fun createBlog(
+        @RequestBody blog: BlogCreateRequestMessage,
+        bindingResult: BindingResult
+    ): ResponseEntity<BlogCreationMessage> {
         bindErrorResult(bindingResult)
-
         val message = blogService.createBlog(blog)
         return ResponseEntity.ok(message)
     }
@@ -91,7 +105,7 @@ class BlogController(
 
     @GetMapping("/indexes")
     @Throws(UserException::class, BlogException::class, CommentException::class)
-    fun getAllBlogIndexes() : ResponseEntity<BlogIndexesResponse> {
+    fun getAllBlogIndexes(): ResponseEntity<BlogIndexesResponse> {
         return ResponseEntity.ok(BlogIndexesResponse(blogService.getAllBlogIndexes()))
     }
 

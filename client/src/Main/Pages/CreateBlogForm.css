@@ -1,0 +1,15 @@
+.createBlogForm {
+    height: 100vh; /* Magic here */
+    display: flex;
+    justify-content: center;
+    padding: 4rem;
+}
+@media (min-width: 768px) {
+    .createBlogForm {
+        height: 80vh; /* Magic here */
+        display: block;
+        justify-content: center;
+        outline: #282c34;
+        border-radius: 10px
+    }
+}

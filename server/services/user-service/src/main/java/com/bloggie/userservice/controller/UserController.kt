@@ -1,6 +1,7 @@
 package com.bloggie.userservice.controller
 
 import com.bloggie.userservice.dto.Messages.*
+import com.bloggie.userservice.dto.user.BlogUser
 import com.bloggie.userservice.exceptions.BlogException
 import com.bloggie.userservice.exceptions.CommentException
 import com.bloggie.userservice.exceptions.UserException
@@ -9,7 +10,6 @@ import org.springframework.http.ResponseEntity
 import org.springframework.validation.BindingResult
 import org.springframework.web.bind.annotation.*
 import javax.validation.Valid
-
 
 @RestController
 class UserController(
@@ -27,7 +27,7 @@ class UserController(
         return ResponseEntity.ok(userUserAuthResponse)
     }
 
-    @PostMapping("/user/registration" )
+    @PostMapping("/user/registration")
     @Throws(UserException::class, BlogException::class, CommentException::class)
     private fun registerUser(
         @Valid @RequestBody userRegistrationRequest: UserRegistrationRequest,
@@ -47,7 +47,12 @@ class UserController(
 //        userService.deleteUser(username)
 //    }
 
-    @get:GetMapping
+    @GetMapping("/user/{username}")
+    fun getUserByUsername(@PathVariable username: String): ResponseEntity<BlogUser> {
+        return ResponseEntity.ok(userService.getUserByUsername(username))
+    }
+
+    @get:GetMapping("/user")
     val allUsers: ResponseEntity<List<Any>> =
         ResponseEntity.ok(userService.allUser)
 

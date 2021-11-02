@@ -131,7 +131,7 @@ open class Messages {
 
     data class UpdateBlogCommentsRequest(
         val blogId: String,
-        val comments: MutableList<Comment>,
+        val comments: MutableList<String>,
         val commentAction: Action
     )
 

@@ -1,19 +1,20 @@
 package com.bloggie.blogservice.service
 
 import com.bloggie.blogservice.authority.Authorities
+import com.bloggie.blogservice.authority.BlogUserAuthority
 import com.bloggie.blogservice.dto.Messages.*
 import com.bloggie.blogservice.dto.blog.Blog
 import com.bloggie.blogservice.dto.blog.BlogIndex
+import com.bloggie.blogservice.entities.BlogAccessStatus
 import com.bloggie.blogservice.exceptions.BlogException
 import com.bloggie.blogservice.exceptions.UserException
 import com.bloggie.blogservice.repository.BlogIndexRepository
 import com.bloggie.blogservice.repository.BlogRepository
+import com.bloggie.blogservice.repository.CommentRepository
 import com.bloggie.blogservice.service.contracts.BlogService
 import com.bloggie.blogservice.service.contracts.PublicProfileService
 import com.bloggie.blogservice.utils.Routes
 import org.bson.types.ObjectId
-import org.springframework.security.core.authority.SimpleGrantedAuthority
-import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.stereotype.Service
 import org.springframework.web.reactive.function.client.WebClient
@@ -26,7 +27,8 @@ class DefaultBlogService(
     val publicProfileService: PublicProfileService,
     val blogIndexRepository: BlogIndexRepository,
     val webClient: WebClient.Builder,
-    val requestService: RequestService
+    val requestService: RequestService,
+    val commentRepository: CommentRepository
 ) : BlogService {
     @Throws(UserException::class)
     override fun createBlog(blogRequestMessage: BlogCreateRequestMessage): BlogCreationMessage {
@@ -60,14 +62,19 @@ class DefaultBlogService(
 
     @Throws(BlogException::class, UserException::class)
     override fun deleteBlog(blogCallMessage: BlogCallMessage): BlogDeletionMessage {
-        val principal = SecurityContextHolder.getContext().authentication.principal as UserDetails
-        val username = principal.username
-        val authorities = principal.authorities as Set<*>
+        val principal: UserDetails
+        var username = ""
+        var authorities = HashSet<BlogUserAuthority>()
+        if (requestService.userAuthentication != null) {
+            principal = requestService.userAuthentication.principal as UserDetails
+            username = principal.username
+            authorities = principal.authorities as HashSet<BlogUserAuthority>
+        }
 
         try {
             val savedBlog = getBlogById(blogCallMessage.blogId)
             val savedBlogIndex = getBlogIndexById(blogCallMessage.blogId)
-            if (username == savedBlog.owner.userName || authorities.contains(SimpleGrantedAuthority(Authorities.ROLE_ADMIN.toString()))) {
+            if (username == savedBlog.owner.userName || authorities.contains(BlogUserAuthority(Authorities.ROLE_ADMIN.toString()))) {
                 blogRepository.delete(savedBlog)
                 blogIndexRepository.delete(savedBlogIndex)
 
@@ -99,8 +106,31 @@ class DefaultBlogService(
 
     @Throws(BlogException::class)
     override fun getBlogById(id: String): Blog {
+        val principal: UserDetails
+        var username = ""
+        if (requestService.userAuthentication != null) {
+            principal = requestService.userAuthentication.principal as UserDetails
+            username = principal.username
+        }
+
         try {
-            return blogRepository.findById(id).get()
+            val blog = blogRepository.findById(id).get()
+            if (requestService.isUserAuthenticated && blog.blogAccessStatus == BlogAccessStatus.PRIVATE) {
+                if (blog.owner.userName == username || blog.sharedWith.contains(
+                        publicProfileService.createPublicProfileByUsername(
+                            username
+                        )
+                    )
+                ) {
+                    return blog
+                } else {
+                    throw BlogException("You can't access this blog")
+                }
+            } else if (blog.blogAccessStatus == BlogAccessStatus.PUBLIC) {
+                return blog
+            } else {
+                return blog
+            }
         } catch (e: IllegalArgumentException) {
             e.printStackTrace()
             throw BlogException("Blog not found with Id: $id")

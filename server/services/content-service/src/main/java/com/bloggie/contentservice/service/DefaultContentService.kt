@@ -7,7 +7,6 @@ import com.bloggie.contentservice.entities.BlogCategory
 import com.bloggie.contentservice.entities.BlogCategory.*
 import com.bloggie.contentservice.service.contracts.ContentService
 import com.bloggie.contentservice.service.contracts.PublicProfileService
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.stereotype.Service
 
@@ -27,7 +26,7 @@ open class DefaultContentService(
 
             when (searchedCategory) {
                 ALL -> if (blog.blogTitle.contains(searchString) || blog.data.contains(searchString)) run {
-                    blogList.add(blog)
+                    addAllAccordingToSearchString(blog, searchString, blogList)
                 }
                 TECHNICAL -> blogList = addAccordingToCategoryAndSearchString(blog, searchString, blogList, TECHNICAL)
 
@@ -44,17 +43,66 @@ open class DefaultContentService(
         return blogList
     }
 
+    private fun addAllAccordingToSearchString(
+        blog: Blog,
+        searchString: String,
+        blogList: MutableList<Blog>,
+    ): MutableList<Blog> {
+        val principal: UserDetails
+        var username = ""
+        if (requestService.userAuthentication != null) {
+            principal = requestService.userAuthentication.principal as UserDetails
+            username = principal.username
+        }
+
+
+        if ((blog.blogTitle.contains(searchString) ||
+                    blog.data.contains(searchString))
+        ) {
+
+            if ((blog.blogAccessStatus == BlogAccessStatus.PUBLIC)) {
+                blogList.add(blog)
+            } else if (requestService.isUserAuthenticated && blog.blogAccessStatus == BlogAccessStatus.PRIVATE &&
+                ((blog.owner.userName == username) ||
+                        (blog.sharedWith.contains(publicProfileService.createPublicProfileByUsername(username)))
+                        )
+            ) {
+                blogList.add(blog)
+            }
+        }
+
+
+        return blogList
+    }
+
     private fun addAccordingToCategoryAndSearchString(
         blog: Blog,
         searchString: String,
         blogList: MutableList<Blog>,
         category: BlogCategory
     ): MutableList<Blog> {
+        val principal: UserDetails
+        var username = ""
+        if (requestService.userAuthentication != null) {
+            principal = requestService.userAuthentication.principal as UserDetails
+            username = principal.username
+        }
+
+
         if (blog.blogCategory == category &&
             (blog.blogTitle.contains(searchString) ||
                     blog.data.contains(searchString))
         ) {
-            blogList.add(blog)
+            if ((blog.blogAccessStatus == BlogAccessStatus.PUBLIC)) {
+                blogList.add(blog)
+            } else if (requestService.isUserAuthenticated && blog.blogAccessStatus == BlogAccessStatus.PRIVATE &&
+                ((blog.owner.userName == username) ||
+                        (blog.sharedWith.contains(publicProfileService.createPublicProfileByUsername(username)))
+                        )
+            ) {
+                blogList.add(blog)
+            }
+
         }
         return blogList
     }

@@ -12,13 +12,13 @@ const RegisterForm = () => {
     const [confirmEmail, setConfirmEmail] = useState('')
     const [password, setPassword] = useState('')
     const [confirmPassword, setConfirmPassword] = useState('')
+    const [registerDisable, setRegisterDisable] = useState(false)
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        const user = {email, userName , password}
+        const user = {email, userName, password}
 
         let body = JSON.stringify(user)
-        body.replace("'", "\"" )
         console.log(user)
 
         const config = {
@@ -27,13 +27,15 @@ const RegisterForm = () => {
             }
         }
 
-        axios.post(`http://localhost:8989/user/registration`, body, config).then(response => {
+        axios.post(`http://localhost:8083/user/registration`, body, config).then(response => {
             console.log(response)
             console.log(response.data)
         }).catch((err) => {
             console.warn('error during http call', err.response);
         });
     };
+
+
 
     return (
         <div>
@@ -52,8 +54,10 @@ const RegisterForm = () => {
                         setConfirmPassword={setConfirmPassword}
                         setUserName={setUserName}
                         setConfirmUserName={setConfirmUserName}
+                        setRegisterDisable={setRegisterDisable}
                     />
-                    <Button variant="contained" type='submit' onClick={handleSubmit}> Register </Button>
+                    <Button disabled={registerDisable} variant="contained" type='submit'
+                            onClick={handleSubmit}> Register </Button>
                     <br/>
                 </FormControl>
             </Container>

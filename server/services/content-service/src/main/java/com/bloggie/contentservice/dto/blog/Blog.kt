@@ -5,7 +5,6 @@ import com.bloggie.contentservice.dto.user.PublicProfile
 import com.bloggie.contentservice.entities.BlogAccessStatus
 import com.bloggie.contentservice.entities.BlogCategory
 import org.springframework.data.annotation.Id
-import org.springframework.data.mongodb.core.mapping.DBRef
 import org.springframework.data.mongodb.core.mapping.Document
 import java.util.*
 import javax.validation.constraints.Size
@@ -25,6 +24,6 @@ data class Blog(
     val blogAccessStatus: BlogAccessStatus,
     val blogCategory: BlogCategory,
     val views: Int,
-    @DBRef(db = "comments") val comments: MutableList<Comment>,
+    val comments: MutableList<String>,
     val sharedWith: MutableList<PublicProfile>
 )

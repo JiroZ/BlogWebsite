@@ -1,7 +1,7 @@
 package com.bloggie.contentservice.configurations.filters
 
-import com.axisbank.server.utils.JwtUtil
 import com.bloggie.contentservice.service.DefaultUserDetailService
+import com.bloggie.contentservice.utils.JwtUtil
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource
@@ -35,6 +35,7 @@ class JwtRequestFilter(
                     userNamePasswordAuthenticationToken
                         .details = WebAuthenticationDetailsSource().buildDetails(request)
                     SecurityContextHolder.getContext().authentication = userNamePasswordAuthenticationToken
+                    response.addHeader("Authorization",  request.getHeader("Authorization"))
                 }
             }
         }

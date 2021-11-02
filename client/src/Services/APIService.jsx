@@ -3,33 +3,49 @@ import axios from "axios";
 let host = 'localhost'
 let port = '8989'
 
-const config = {
-    headers : {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin' :'*'
-    }
-}
-
 class APIService {
-    static registerUser(props) {
-        console.log("Register User")
-        return axios.post(`http://${host}:${port}/user/registration`, props.body)
+
+    static config = {
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*'
+        }
     }
 
-    static authUser(props) {
-        console.log("Auth User")
-        return axios.post(`http://${host}:${port}/user/auth`, props.body)
+    static registerUser(body) {
+        return axios.post(`http://${host}:8083/user/registration`, body)
+    }
+
+    static authUser(body) {
+        return axios.post(`http://${host}:8083/user/auth`, body)
     }
 
     static getAccessibleData() {
-        console.log("Accessible Data")
-        return axios.get(`http://${host}:${port}`)
+        return axios.get(`http://${host}:8082`)
     }
 
-     static getSearchedData(body) {
-        console.log("Searched Data")
-        return axios.post(`http://${host}:${port}/search`, body, config)
+    static getBlogCategories() {
+        return axios.get(`http://${host}:${port}/categories`)
+    }
+
+    static getSearchedData(body) {
+        return axios.post(`http://${host}:${port}/search`, body, APIService.config)
+    }
+
+    static getBlogAccesses() {
+        return axios.get(`http://${host}:${port}/blog/accesses`, APIService.config)
+    }
+
+    static getBlogById(id) {
+        return axios.get(`http://${host}:${port}/blog/` + id, APIService.config)
+    }
+
+    static getCommentById(commentId) {
+        return axios.get(`http://${host}:${port}/blog/comment/` + commentId, APIService.config)
     }
 }
-export default APIService
+
+export {
+    APIService
+}

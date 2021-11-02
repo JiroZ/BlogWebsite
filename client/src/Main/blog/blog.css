@@ -1,0 +1,39 @@
+body {
+    display: flex;
+    height: 100vh;
+    width: 100vw;
+    justify-content: center;
+}
+.blog-title {
+    height: 100vh;
+    width: 100vw;
+    position: relative;
+    color: white;
+    align-self: flex-start;
+}
+.blog-data-container {
+    border-radius: 40px;
+    background-color: cornsilk;
+}
+.blog-data {
+    padding: 2rem;
+    justify-content: start;
+}
+
+.blog-banner {
+    height: 30vh;
+    width: 70vw;
+    justify-self: center;
+    align-self: center;
+}
+
+.comment-form {
+    padding-top: 100px;
+}
+
+.comment-container {
+    background-color: gainsboro;
+    border-radius: 40px;
+    padding: 10px
+}
+

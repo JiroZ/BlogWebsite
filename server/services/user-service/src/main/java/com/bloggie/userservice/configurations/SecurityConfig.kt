@@ -1,6 +1,5 @@
 package com.bloggie.userservice.configurations
 
-import com.bloggie.userservice.authority.Authorities
 import com.bloggie.userservice.configurations.filters.JwtRequestFilter
 import com.bloggie.userservice.service.DefaultUserDetailService
 import org.springframework.context.annotation.Bean
@@ -30,11 +29,8 @@ open class SecurityConfig(
     }
 
     override fun configure(http: HttpSecurity) {
-        http.csrf().disable()
+        http.cors().and().csrf().disable()
             .authorizeRequests()
-            .antMatchers("/**").hasIpAddress("127.0.0.1")
-            .antMatchers("/blog/**", "/private").authenticated()
-            .antMatchers("/user", "/blog", "/user/delete/{\\\\d+}").hasAuthority(Authorities.ROLE_ADMIN.toString())
             .anyRequest().permitAll()
             .and()
             .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)

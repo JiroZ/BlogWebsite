@@ -1,4 +1,4 @@
-package com.axisbank.server.utils
+package com.bloggie.contentservice.utils
 
 import io.jsonwebtoken.Claims
 import io.jsonwebtoken.Jwts

@@ -35,7 +35,7 @@ class JwtRequestFilter(
                     userNamePasswordAuthenticationToken
                         .details = WebAuthenticationDetailsSource().buildDetails(request)
                     SecurityContextHolder.getContext().authentication = userNamePasswordAuthenticationToken
-                    response.addHeader("Authorization", jwt)
+                    response.addHeader("Authorization",  request.getHeader("Authorization"))
                 }
             }
         }

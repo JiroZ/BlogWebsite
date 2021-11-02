@@ -8,6 +8,9 @@ import axios from 'axios'
 import  {useDispatch} from "react-redux";
 import {CloseUserModel, InitAuthResponse, SignIn} from "../../../../Redux/UserLogin/Actions";
 
+import {LoadAuthToken, SaveAuthResponse, SaveAuthToken} from "../../../ReduxUtils/ReduxPersist.jsx"
+
+import './LoginForm.css'
 
 const LoginForm = () => {
     const [password, setPassword] = useState('')
@@ -27,21 +30,28 @@ const LoginForm = () => {
             }
         }
 
-        axios.post(`http://localhost:8989/user/auth`, body, config).then(response => {
+        axios.post(`http://localhost:8083/user/auth`, body, config).then(response => {
             console.log(response)
             if(response.data.authenticated) {
                 dispatch(InitAuthResponse(response.data))
                 dispatch(SignIn())
                 dispatch(CloseUserModel())
+                SaveAuthToken(response.data.token)
+                SaveAuthResponse(response.data)
             }
         }).catch((err) => {
             console.warn('error during http call', err);
             console.warn('error during http call Response: ', err.response);
         });
+        console.log(LoadAuthToken())
     };
 
+    const formDisabledCondition = () => {
+        return (password === '' && userName === '')
+    }
+
     return (
-        <div className="form">
+        <div className="form login-form">
             <FormControl noValidate autoComplete="off" onSubmit={handleSubmit}>
                 <LoginElements
                     password={password}
@@ -49,7 +59,7 @@ const LoginForm = () => {
                     userName={userName}
                     setUserName={setUserName}
                 />
-                <Button variant="contained" type='submit' onClick={handleSubmit}> Login </Button>
+                <Button disabled={formDisabledCondition()} variant="contained" type='submit' onClick={handleSubmit}> Login </Button>
                 <br/>
             </FormControl>
         </div>

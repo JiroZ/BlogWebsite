@@ -1,16 +1,18 @@
 package com.bloggie.blogservice.service
 
 import com.bloggie.blogservice.authority.Authorities
+import com.bloggie.blogservice.authority.BlogUserAuthority
 import com.bloggie.blogservice.dto.Messages.*
 import com.bloggie.blogservice.dto.blog.Comment
 import com.bloggie.blogservice.entities.Action
+import com.bloggie.blogservice.entities.BlogAccessStatus
 import com.bloggie.blogservice.exceptions.BlogException
 import com.bloggie.blogservice.exceptions.CommentException
 import com.bloggie.blogservice.exceptions.UserException
+import com.bloggie.blogservice.repository.BlogRepository
 import com.bloggie.blogservice.repository.CommentRepository
 import com.bloggie.blogservice.service.contracts.CommentService
 import org.bson.types.ObjectId
-import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.stereotype.Service
@@ -22,8 +24,44 @@ open class DefaultCommentService(
     val publicProfileService: DefaultPublicProfileService,
     val defaultBlogService: DefaultBlogService,
     val blogUpdateService: DefaultBlogUpdateManagementService,
-    val requestService: RequestService
+    val requestService: RequestService,
+    val blogRepository: BlogRepository
 ) : CommentService {
+
+    @Throws(CommentException::class, BlogException::class)
+    fun getComment(commentId: String): Comment {
+        val principal: UserDetails
+        var username = ""
+        if (requestService.userAuthentication != null) {
+            principal = requestService.userAuthentication.principal as UserDetails
+            username = principal.username
+        }
+
+        try {
+            val comment = commentRepository.findById(commentId).get()
+            val blog = blogRepository.findById(comment.blogId).get()
+
+            if (requestService.isUserAuthenticated && blog.blogAccessStatus == BlogAccessStatus.PRIVATE) {
+                if (blog.owner.userName == username || blog.sharedWith.contains(
+                        publicProfileService.createPublicProfileByUsername(
+                            username
+                        )
+                    )
+                ) {
+                    return comment
+                } else {
+                    throw BlogException("You can't access this blog")
+                }
+            } else if (blog.blogAccessStatus == BlogAccessStatus.PUBLIC) {
+                return comment
+            } else {
+                return comment
+            }
+        } catch (e: IllegalArgumentException) {
+            e.printStackTrace()
+            throw CommentException("Comment not found with Id: $commentId")
+        }
+    }
 
     @Throws(CommentException::class, UserException::class, BlogException::class)
     override fun addComment(blogCommentCreateMessage: BlogCommentCreateMessage): BlogCommentResponse {
@@ -41,12 +79,12 @@ open class DefaultCommentService(
             )
             commentRepository.save(comment)
 
-            savedBlog.comments.add(comment)
+            savedBlog.comments.add(comment.commentId)
 
             blogUpdateService.updateBlogComments(UpdateBlogCommentsRequest(savedBlog.id, savedBlog.comments, Action.ADD))
 
             return BlogCommentResponse(comment, "Comment Added Successfully")
-        } catch (e: IllegalStateException) {
+        } catch (e: Exception) {
             e.printStackTrace()
             throw CommentException("An error occurred while saving the comment")
         }
@@ -62,10 +100,10 @@ open class DefaultCommentService(
 
             val savedBlog = defaultBlogService.getBlogById(blogCommentDeletionMessage.blogId)
             val comment = getCommentById(blogCommentDeletionMessage.commentId)
-            if (authenticatedUser == savedBlog.owner.userName || authorities.contains(SimpleGrantedAuthority(Authorities.ROLE_ADMIN.toString()))) {
+            if (authenticatedUser == savedBlog.owner.userName || authorities.contains(BlogUserAuthority(Authorities.ROLE_ADMIN.toString()))) {
                 commentRepository.delete(comment)
 
-                savedBlog.comments.remove(comment)
+                savedBlog.comments.remove(comment.commentId)
 
 
                 blogUpdateService.updateBlogComments(UpdateBlogCommentsRequest(savedBlog.id, savedBlog.comments, Action.ADD))
@@ -101,7 +139,7 @@ open class DefaultCommentService(
         try {
             val savedBlog = defaultBlogService.getBlogById(blogCommentUpdateMessage.blogId)
             val savedComment = getCommentById(blogCommentUpdateMessage.commentId)
-            if (username == savedBlog.owner.userName || authorities.contains(SimpleGrantedAuthority(Authorities.ROLE_ADMIN.toString()))) {
+            if (username == savedBlog.owner.userName || authorities.contains(BlogUserAuthority(Authorities.ROLE_ADMIN.toString()))) {
 
                 val newComment = Comment(
                     savedBlog.id,
@@ -110,11 +148,11 @@ open class DefaultCommentService(
                     blogCommentUpdateMessage.comment,
                     Date(System.currentTimeMillis())
                 )
-                savedBlog.comments.remove(savedComment)
+                savedBlog.comments.remove(savedComment.commentId)
 
                 commentRepository.save(newComment)
 
-                savedBlog.comments.add(newComment)
+                savedBlog.comments.add(newComment.commentId)
 
                 blogUpdateService.updateBlogComments(UpdateBlogCommentsRequest(savedBlog.id, savedBlog.comments, Action.ADD))
 

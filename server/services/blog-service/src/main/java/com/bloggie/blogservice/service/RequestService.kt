@@ -4,6 +4,7 @@ import com.bloggie.blogservice.dto.user.BlogUser
 import com.bloggie.blogservice.exceptions.UserException
 import com.bloggie.blogservice.utils.Routes
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.bodyToMono
@@ -22,7 +23,10 @@ class RequestService(
                 .bodyToMono<BlogUser>()
                 .block()!!
         } catch (e: Exception) {
-            throw UserException("Problem while catching getting user: " + e.message);
+            throw UserException("Problem while getting user through request service: " + e.message);
         }
     }
+
+    val userAuthentication = SecurityContextHolder.getContext().authentication
+    val isUserAuthenticated = (SecurityContextHolder.getContext().authentication != null)
 }

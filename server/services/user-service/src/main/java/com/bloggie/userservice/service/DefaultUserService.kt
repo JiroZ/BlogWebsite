@@ -1,6 +1,7 @@
 package com.bloggie.userservice.service
 
 import com.bloggie.userservice.authority.Authorities
+import com.bloggie.userservice.authority.BlogUserAuthority
 import com.bloggie.userservice.dto.Messages
 import com.bloggie.userservice.dto.blog.Blog
 import com.bloggie.userservice.dto.user.BlogUser
@@ -10,7 +11,6 @@ import com.bloggie.userservice.service.contracts.UserService
 import com.bloggie.userservice.utils.JwtUtil
 import org.springframework.dao.DuplicateKeyException
 import org.springframework.security.authentication.*
-import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.stereotype.Service
@@ -94,7 +94,7 @@ class DefaultUserService(
                     BCryptPasswordEncoder().encode(userRegistrationRequest.password),
                     userRegistrationRequest.email,
                     ArrayList(),
-                    HashSet(Collections.singletonList(SimpleGrantedAuthority(Authorities.ROLE_USER.toString())))
+                    HashSet(Collections.singletonList(BlogUserAuthority(Authorities.ROLE_USER.toString())))
                 )
                 userRepository.insert(user)
                 registrationMessage.user = user

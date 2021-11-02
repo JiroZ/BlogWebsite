@@ -6,17 +6,13 @@ const LoginElements = (props) => {
 
     return (
         <>
-            <TextField error={userNameError} label="User Name" type="userName" required value={props.userName}
+            <TextField fullWidth id="fullWidth" error={userNameError} label="User Name" type="userName" required value={props.userName}
                        onChange={(e) => props.setUserName(e.target.value)}/>
             <br/>
 
-            <TextField label="Password" type="password" required value={props.password}
+            <TextField fullWidth id="fullWidth" label="Password" type="password" required value={props.password}
                        onChange={(e) => props.setPassword(e.target.value)}/>
             <br/>
-
-            <label>{props.userName}</label>
-            <label>{props.email}</label>
-            <label>{props.password}</label>
         </>
     )
 }

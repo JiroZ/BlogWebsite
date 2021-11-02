@@ -9,15 +9,9 @@ export const MenuItems = [
         component: HomeComponent
     },
     {
-        title:'Tech News',
-        url:'/tech-news',
-        cName:'nav-links',
-        component: ContactUsComponent
-    },
-    {
         title:'Contact Us',
         url:'/contact-us',
-        cName:'nav-links',
+        cName:'nav-links-auth',
         component: ContactUsComponent
     },
 ]

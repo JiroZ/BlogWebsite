@@ -8,6 +8,7 @@ import {useDispatch, useSelector} from "react-redux";
 import {CloseUserModel, OpenUserModel} from "../../../../Redux/UserLogin/Actions";
 
 import {Modal, Nav, Button} from 'react-bootstrap';
+import {LogOutUser} from "../../../../Managers/UserManager";
 
 const UserModel = () => {
     const [isLoginModel, setLoginModel] = useState(true);
@@ -22,7 +23,6 @@ const UserModel = () => {
     function handleRegister() {
         if (!isLoginModel) {
             console.log("Register");
-            //Todo: Send Register Request
         } else {
             setLoginModel(false);
         }
@@ -31,7 +31,6 @@ const UserModel = () => {
     function handleSignIn() {
         if (isLoginModel) {
             console.log("Login");
-            //Todo: send Sign in request
         } else {
             setLoginModel(true);
         }
@@ -45,12 +44,17 @@ const UserModel = () => {
         dispatch(CloseUserModel())
     }
 
+    function getLogoutButton() {
+        return (
+            <Button onClick={(e) => LogOutUser()}>Log Out</Button>
+        )
+    }
+
     return (
         <>
             {
                 isUserAuthenticated ?
-                    <div><label>Welcome {userEmail}</label><Button className="userActionButton"> + </Button></div> :
-
+                    <div><label>Welcome {userEmail}</label> {getLogoutButton()}</div> :
                     <Nav.Link className="userActionButton" onClick={handleUserModel}>
                         Sign In
                     </Nav.Link>
@@ -67,11 +71,12 @@ const UserModel = () => {
                         <Button onClick={handleCloseModel}><i className="fas fa-times"/>X</Button>
                     </Modal.Title>
                 </Modal.Header>
+
                 <Modal.Body>
                     <div className='taskBar'>
                     </div>
                     <div className='modelBody'>
-                        {isLoginModel ? <LoginBody/> : <RegisterBody/>}
+                        {isLoginModel ? <LoginBody className="user-body"/> : <RegisterBody className="user-body"/>}
                     </div>
                     {isLoginModel ?
                         <label>Don't have a account?</label> :
@@ -82,6 +87,7 @@ const UserModel = () => {
                         <Button variant="contained" onClick={handleSignIn}>Sign In</Button>
                     }
                 </Modal.Body>
+
             </Modal>
         </>
     );
